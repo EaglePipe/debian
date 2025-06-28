@@ -1,8 +1,8 @@
 #! /bin/sh
-
-
-bspc monitor -d 1 2 3 4 5 6 7 8 9 PM
-
+xrandr --output eDP-1 --primary --mode 1920x1080 --rotate normal --output DP-1-3.2 --mode 3840x1080 --rotate normal --left-of eDP-1
+bspc wm -O eDP-1 DP-1-3.2
+bspc monitor eDP-1 -d 8 9 i
+bspc monitor %DP-1-3.2 -d 1 2 3 4 5 6 7
 bspc config border_width         5
 bspc config window_gap          6
 
@@ -15,9 +15,9 @@ bspc config focused_border_color "#ce6600"
 #539bf5
 
 
-bspc rule -a Geany desktop='^7' follow=on
-bspc rule -a Brave-browser desktop='^1' follow=on
-bspc rule -a Portmaster desktop='^10'
+bspc rule -a Geany desktop='7' follow=on
+bspc rule -a Brave-browser desktop='1' follow=on
+bspc rule -a Portmaster desktop='i'
 #bspc rule -a Xfce4-terminal desktop='^2' follow=on
 
 #Autostart
@@ -25,7 +25,8 @@ sxhkd &
 picom &
 nitrogen --restore &
 dunst &
-polybar &
+polybar intern &
+polybar extern &
 nm-applet &
 xsetroot -cursor_name left_ptr
 /opt/safing/portmaster/portmaster-start app &
