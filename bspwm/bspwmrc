@@ -28,10 +28,13 @@ dunst &
 polybar intern &
 polybar extern &
 nm-applet &
+qsync &
+flatpak run com.discordapp.Discord &
 xsetroot -cursor_name left_ptr
 /opt/safing/portmaster/portmaster-start app &
 flatpak run org.remmina.Remmina & 
-1password
+1password &
+/usr/local/bin/QNAP/QsyncClient/Qsync.sh &
 #(sleep 3 && bspc desktop --focus 1)
 #(sleep 5 && xfce4-terminal)
 #bspc rule -a Gimp desktop='^8' state=floating follow=on
