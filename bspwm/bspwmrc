@@ -17,7 +17,7 @@ bspc config focused_border_color "#ce6600"
 
 bspc rule -a Geany desktop='7' follow=on
 bspc rule -a Brave-browser desktop='1' follow=on
-bspc rule -a Portmaster desktop='0'
+bspc rule -a Portmaster desktop='i'
 #bspc rule -a Xfce4-terminal desktop='^2' follow=on
 
 #Autostart
