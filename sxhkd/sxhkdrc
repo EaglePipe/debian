@@ -124,7 +124,7 @@ super + alt + Right
 
 # Switch to Workspace 1-12
 super + {1-9,0,minus,equal}
-	bspc desktop --focus ^{1-9,10,11,12}
+	bspc desktop --focus {1-9,10,11,12}
 
 # Move Focused Window to Workspace 1-12
 super + shift + {1-9,0,minus,equal}
@@ -176,7 +176,7 @@ XF86MonBrightnessDown
 	brightnessctl set 5%-
 
 # Take a Screenshot (Region Select)
-super + Print
+ctrl + d
 	flameshot gui --path ~/Screenshots/
 
 # Take a Fullscreen Screenshot
