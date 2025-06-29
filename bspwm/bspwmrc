@@ -28,7 +28,7 @@ dunst &
 polybar intern &
 polybar extern &
 nm-applet &
-qsync &
+flatpak run com.core447.StreamController
 flatpak run com.discordapp.Discord &
 xsetroot -cursor_name left_ptr
 /opt/safing/portmaster/portmaster-start app &
@@ -42,3 +42,4 @@ flatpak run org.remmina.Remmina &
 #bspc rule -a mplayer2 state=floating
 #bspc rule -a Kupfer.py focus=on
 #bspc rule -a Screenkey manage=off
+numlockx on
