@@ -1,26 +1,57 @@
-#! /bin/sh
-xrandr --output eDP-1 --primary --mode 1920x1080 --rotate normal --output DP-1-3.2 --mode 3840x1080 --rotate normal --left-of eDP-1
-bspc wm -O eDP-1 DP-1-3.2
-bspc monitor eDP-1 -d 8 9 i
-bspc monitor %DP-1-3.2 -d 1 2 3 4 5 6 7
-bspc config border_width         5
-bspc config window_gap          6
+#!/bin/sh
 
+MONITOR_EXT="DP-1-3.2"
+MONITOR_INT="eDP-1"
+PREF_RES="3840x1080"
+FALLBACK_RES="1920x1080"
+
+# Prüfe ob externer Monitor verbunden ist
+EXT_CONNECTED=$(xrandr | grep "^$MONITOR_EXT connected")
+
+if [ -n "$EXT_CONNECTED" ]; then
+  # Monitor connected, prüfe Auflösung
+  if xrandr | grep -A1 "^$MONITOR_EXT connected" | grep -q "$PREF_RES"; then
+    xrandr --output $MONITOR_INT --primary --mode 1920x1080 --rotate normal \
+           --output $MONITOR_EXT --mode $PREF_RES --rotate normal --left-of $MONITOR_INT
+  else
+    xrandr --output $MONITOR_INT --primary --mode 1920x1080 --rotate normal \
+           --output $MONITOR_EXT --mode $FALLBACK_RES --rotate normal --left-of $MONITOR_INT
+  fi
+else
+  # Kein externer Monitor, nur Laptop
+  xrandr --output $MONITOR_INT --primary --mode 1920x1080 --rotate normal --off $MONITOR_EXT
+fi
+
+sleep 2
+
+# Debug Ausgabe
+echo "Bspwm Monitore:" $(bspc query -M --names) >&2
+
+if bspc query -M --names | grep -q "$MONITOR_EXT"; then
+  bspc wm -O $MONITOR_INT $MONITOR_EXT
+  # Monitor mit % für externen Monitor!
+  bspc monitor $MONITOR_INT -d 8 9 i
+  bspc monitor %$MONITOR_EXT -d 1 2 3 4 5 6 7
+else
+  bspc wm -O $MONITOR_INT
+  bspc monitor $MONITOR_INT -d 1 2 3 4 5 6 7 8 9 i
+fi
+
+# bspwm config
+bspc config border_width         5
+bspc config window_gap           6
 bspc config split_ratio          0.52
 bspc config borderless_monocle   true
 bspc config gapless_monocle      true
-
-bspc config active_border_color	"#ce6600"
+bspc config active_border_color  "#ce6600"
 bspc config focused_border_color "#ce6600"
-#539bf5
 
-
+# bspwm Regeln
 bspc rule -a Geany desktop='7' follow=on
 bspc rule -a Brave-browser desktop='1' follow=on
 bspc rule -a Portmaster desktop='i'
-#bspc rule -a Xfce4-terminal desktop='^2' follow=on
 
-#Autostart
+# Autostart-Programme
 sxhkd &
 picom &
 nitrogen --restore &
@@ -36,11 +67,4 @@ flatpak run org.remmina.Remmina &
 1password &
 /usr/local/bin/QNAP/QsyncClient/Qsync.sh &
 flameshot &
-#(sleep 3 && bspc desktop --focus 1)
-#(sleep 5 && xfce4-terminal)
-#bspc rule -a Gimp desktop='^8' state=floating follow=on
-#bspc rule -a Chromium desktop='^2'
-#bspc rule -a mplayer2 state=floating
-#bspc rule -a Kupfer.py focus=on
-#bspc rule -a Screenkey manage=off
 numlockx on
