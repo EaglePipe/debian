@@ -22,7 +22,7 @@ super + space
 	#dmenu_run
 # Launch File Manager (Thunar)
 super + f
-	pcmanfm	
+	thunar	
 #thunar
 
 # Launch Geany (Text Editor)
