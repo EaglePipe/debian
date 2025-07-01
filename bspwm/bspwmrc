@@ -31,7 +31,7 @@ if bspc query -M --names | grep -q "$MONITOR_EXT"; then
   bspc wm -O $MONITOR_INT $MONITOR_EXT
   # Monitor mit % für externen Monitor!
   bspc monitor $MONITOR_INT -d 7 8 9 i
-  bspc monitor %$MONITOR_EXT -d 1 2 3 4 5 6 7
+  bspc monitor %$MONITOR_EXT -d 1 2 3 4 5 6
 else
   bspc wm -O $MONITOR_INT
   bspc monitor $MONITOR_INT -d 1 2 3 4 5 6 7 8 9 i
