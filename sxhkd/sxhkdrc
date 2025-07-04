@@ -165,7 +165,7 @@ XF86AudioLowerVolume
 
 # Mute/Unmute Output
 XF86AudioMute
-    	~/Nextcloud/Dokumente/scripts/debian12/workerscripts/mute.sh
+    	~/Dokumente/V-IT/scripts/mute.sh
 
 
 # Increase Screen Brightness
@@ -187,3 +187,8 @@ Print
 # Resize All Windows Equally
 super + equal
 	bspc query -N -d | xargs -I % bspc node % -B
+
+# Launch xcalc (Calculator)
+XF86Calculator
+	xcalc
+
