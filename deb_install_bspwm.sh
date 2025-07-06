@@ -32,6 +32,12 @@ sudo echo "options snd_intel_dspcfg dsp_driver=1" > /etc/modprobe.d/dsp-fix.conf
 #Install Brave Browser
 curl -fsS https://dl.brave.com/install.sh | sh
 
+# AnyDesk Repository hinzufügen
+wget -qO - https://keys.anydesk.com/repos/DEB-GPG-KEY | sudo gpg --dearmor -o /usr/share/keyrings/anydesk.gpg
+echo "deb [signed-by=/usr/share/keyrings/anydesk.gpg] http://deb.anydesk.com/ all main" | sudo tee /etc/apt/sources.list.d/anydesk.list
+sudo nala update
+sudo nala install anydesk -y
+
 #Add Flathub Repo
 flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
