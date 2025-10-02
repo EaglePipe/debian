@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  immich-server:
+    image: ghcr.io/immich-app/immich-server:v2.0.0
+    container_name: immich-server
+    restart: unless-stopped
+    ports:
+      - "2283:2283"   # Aufruf über http://NAS-IP:2283
+    environment:
+      TZ: Europe/Berlin
+      DB_HOSTNAME: immich-postgres
+      DB_USERNAME: immich_user
+      DB_PASSWORD: starkesPasswort123!   # <- bitte anpassen
+      DB_DATABASE_NAME: immich
+      REDIS_HOSTNAME: immich-redis
+    volumes:
+      # Hier landen alle Fotos & Videos
+      - /share/Immich:/usr/src/app/upload
+
+      # Server-Konfiguration
+      - /share/Container-Station/immich/server:/config
+    depends_on:
+      - immich-postgres
+      - immich-redis
+      - immich-ml
+
+  immich-ml:
+    image: ghcr.io/immich-app/immich-machine-learning:v2.0.0
+    container_name: immich-ml
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Berlin
+    volumes:
+      - /share/Container-Station/immich/ml:/cache
+    depends_on:
+      - immich-postgres
+      - immich-redis
+
+  immich-redis:
+    image: redis:6
+    container_name: immich-redis
+    restart: unless-stopped
+
+  immich-postgres:
+    image: tensorchord/pgvecto-rs:pg14-v0.2.0
+    container_name: immich-postgres
+    restart: unless-stopped
+    environment:
+      TZ: Europe/Berlin
+      POSTGRES_USER: immich_user
+      POSTGRES_PASSWORD: starkesPasswort123!   # <- gleich wie oben
+      POSTGRES_DB: immich
+    volumes:
+      - /share/Container-Station/immich/postgres:/var/lib/postgresql/data
