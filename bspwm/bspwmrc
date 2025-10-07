@@ -67,4 +67,6 @@ flatpak run org.remmina.Remmina &
 1password &
 /usr/local/bin/QNAP/QsyncClient/Qsync.sh &
 flameshot &
+pgrep -f evolution-alarm-notify >/dev/null || /usr/libexec/evolution-data-server/evolution-alarm-notify &
 numlockx on
+
