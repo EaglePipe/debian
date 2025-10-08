@@ -12,9 +12,9 @@ super + Return
 	kitty
 #xfce4-terminal
 
-# Launch Betterbird Mail
+# Launch Evolution Mail
 super + m
-	flatpak run eu.betterbird.Betterbird -mail
+	evolution
 
 # Launch Rofi Application Menu
 #super + ctrl + alt + Return

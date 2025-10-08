@@ -1,53 +1,56 @@
 #!/bin/bash
-# Polybar Evolution Statusanzeige (präzise Multi-Konto-Version)
-# Zeigt graues @, wenn Evolution läuft, orange @, wenn in irgendeinem Konto ungelesene Mails sind
+# Polybar Evolution Statusanzeige (saubere Version mit verwaisten Fix)
+# Grau = keine ungelesenen Mails, Orange = neue ungelesene Mails
 
 ICON="@"
-COLOR_ACTIVE="#888888"   # Grau – Evolution offen, keine neuen Mails
-COLOR_ALERT="#CE6600"    # Orange – Neue Mails
+COLOR_ACTIVE="#888888"
+COLOR_ALERT="#CE6600"
 
 # Prüfen, ob Evolution läuft
-if ! pgrep -f "evolution$" >/dev/null; then
-  echo ""
-  exit 0
-fi
+pgrep -f "evolution$" >/dev/null || { echo ""; exit 0; }
 
-# Basispfade für Maildaten
-MAIL_PATHS=(
-  "$HOME/.cache/evolution/mail/"
-  "$HOME/.local/share/evolution/mail/"
-)
+total_unread=0
+valid_unread=0
 
-has_unread=false
+# --- Durchsuche alle Konten ---
+for f in "$HOME/.cache/evolution/mail/"*/folder-tree; do
+  [ -f "$f" ] || continue
 
-for BASE in "${MAIL_PATHS[@]}"; do
-  # 1️⃣ Exchange / EWS / IMAP caches mit folder-tree-Dateien prüfen
-  while IFS= read -r file; do
-    # Nur echte Ordner (kein Trash, Junk)
-    if [[ "$file" =~ trash|junk ]]; then
-      continue
-    fi
-    # Nur Treffer, wenn wirklich UnRead > 0
-    if grep -q "UnRead=[1-9][0-9]*" "$file" 2>/dev/null; then
-      has_unread=true
-      break 2
-    fi
-  done < <(find "$BASE" -type f -name "folder-tree" 2>/dev/null)
+  # Zähle nur Posteingänge, ignoriere veraltete Caches
+  count=$(awk '
+    BEGIN {IGNORECASE=1; folder=""; unread=0; valid=0}
+    /^\[Folder/ {folder=$0}
+    /UnRead=/ {
+      split($0,a,"=")
+      val=a[2]+0
+      if (folder ~ /Inbox|Posteingang/ && val>0) {
+        unread+=val
+        valid=1
+      }
+    }
+    END {
+      if (valid) print unread
+      else print 0
+    }
+  ' "$f")
 
-  # 2️⃣ Lokale oder IMAP .ev-summary-Datenbanken prüfen
-  while IFS= read -r db; do
-    # Überspringen, falls Datenbank leer oder defekt
-    count=$(sqlite3 "$db" "SELECT COUNT(*) FROM messages WHERE read=0;" 2>/dev/null)
-    if [[ "$count" =~ ^[0-9]+$ ]] && [ "$count" -gt 0 ]; then
-      has_unread=true
-      break 2
-    fi
-  done < <(find "$BASE" -type f -name "*.ev-summary" 2>/dev/null)
+  [[ "$count" =~ ^[0-9]+$ ]] || count=0
+  total_unread=$((total_unread + count))
+  if [ "$count" -gt 0 ]; then valid_unread=1; fi
 done
 
-# 🔹 Ausgabe
-if $has_unread; then
-  echo "%{F$COLOR_ALERT}$ICON%{F-}"
+# --- Datenbanken (iCloud, GMX usw.) ---
+for db in "$HOME/.cache/evolution/mail/"*/folders.db; do
+  [ -f "$db" ] || continue
+  count=$(sqlite3 "$db" "SELECT SUM(unread_count) FROM folders WHERE folder_name LIKE 'INBOX%' OR folder_name LIKE 'Posteingang%';" 2>/dev/null)
+  [[ "$count" =~ ^[0-9]+$ ]] || count=0
+  total_unread=$((total_unread + count))
+  if [ "$count" -gt 0 ]; then valid_unread=1; fi
+done
+
+# --- Ausgabe ---
+if [ "$valid_unread" -eq 1 ] && [ "$total_unread" -gt 0 ]; then
+  echo "%{F$COLOR_ALERT}$ICON $total_unread%{F-}"
 else
   echo "%{F$COLOR_ACTIVE}$ICON%{F-}"
 fi
